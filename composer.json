@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-0": {
+            "App": "src"
+        }
+    },
+    "require": {
+        "cboden/Ratchet": "dev-master",
+        "react/zmq": "0.1.*"
+    }
+}

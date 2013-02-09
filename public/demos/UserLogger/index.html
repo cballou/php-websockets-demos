@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Websockets | User Logger Demo</title>
+        <link href="../../css/bootstrap.css" rel="stylesheet" media="screen">
+        <link href="../../css/custom.css" rel="stylesheet" media="screen">
+        <style>
+        html, body { width: 100%; height: 100%; background: #f0f0f0; color: #222; }
+        #main { padding: 20px; }
+        .user {
+            display: inline-block;
+            background: #e0e0e0;
+            -moz-border-radius: 6px;
+            -webkit-border-radius: 6px;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 0 10px 10px 0;
+            width: 280px;
+            border-top: 1px solid #fcfcfc;
+            border-left: 1px solid #fcfcfc;
+            border-bottom: 2px solid #ccc;
+            border-right: 2px solid #ccc;
+        }
+        .user h4 { text-align: center; text-transform: uppercase; margin-bottom: 4px; }
+        .user small { display: block; margin-bottom: 10px; text-align: center; font-style: italic; color: #888; }
+        .user ul { display: block; }
+        .user li { display: block; list-style: none; margin: 0; padding: 0; }
+        p { font-size: 32px; line-height: 1.4; }
+        *.unselectable {
+           -moz-user-select: -moz-none;
+           -khtml-user-select: none;
+           -webkit-user-select: none;
+           -ms-user-select: none;
+           user-select: none;
+        }
+        </style>
+    </head>
+    <body class="unselectable">
+        <div id="main" class="unselectable">
+            <h1><a href="../">WebSockets PHP Demos</a> &rsaquo; User Logger</h1>
+            <div id="credits">
+                <span>
+                    Authored by <a href="http://coreyballou.co">Corey Ballou</a><br />
+                    <a href="http://twitter.com/cballou">@cballou</a> on twitter<br />
+                    <a href="http://github.com/cballou/php-websockets-demos/">fork on github</a>
+                </span>
+            </div>
+            <p>
+            In this demo, we demonstrate the most basic WebSocket functionality.
+            We're only handling a single message type which broadcasts your
+            browser information to all other connected users. Think of this as
+            the precursor to a user-aware sidebar widget, much the same as you'd
+            see on a forum displaying connected users but in <em>realtime</em>.
+            The WS server simply acts as an intermediary, distributing JSON encoded
+            messages to all connected clients via open socket connections. It is
+            the responsibility of the client-side JavaScript to parse and interpret
+            these messages.
+            </p>
+
+            <div id="users"></div>
+        </div>
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script src="../../js/bootstrap.js"></script>
+        <script src="../../js/demos/userlogger.js"></script>
+    </body>
+</html>

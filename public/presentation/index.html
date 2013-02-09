@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Creating Realtime Applications with PHP and Websockets</title>
+		<meta name="description" content="Creating Realtime Applications with PHP and Websockets">
+		<meta name="author" content="Corey Ballou">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+		<link rel="stylesheet" href="css/overrides.css">
+
+		<!-- syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<!-- Title -->
+				<section>
+					<h1>Creating Realtime Applications with PHP and Websockets</h1>
+					<p>
+					<small>
+					<a href="http://coreyballou.co" class="alt">Corey Ballou</a> &nbsp;&middot;&nbsp;
+					<a href="http://twitter.com/cballou" class="alt">@cballou</a>
+					</small>
+					</p>
+
+					<a href="http://go.co" class="image" target="_blank">
+						<img src="img/dotco.png" height="" width="" class="no" alt=".CO" />
+					</a>
+
+					<aside class="notes">
+                        &middot; Queen City PHP co-organizer <br />
+						&middot; .CO employee <br />
+						&middot; Stop me to ask questions
+					</aside>
+				</section>
+
+				<!-- What are websockets -->
+				<section>
+					<h2>SO... WHAT ARE WEBSOCKETS?</h2>
+
+					<ul class="b20">
+						<li>Full-duplex client/server communication over TCP</li>
+						<li>Hackery piggybacking on HTTP handshake</li>
+						<li><a href="http://tools.ietf.org/html/rfc6455">RFC6455</a>, <em>an official protocol!</em></li>
+					</ul>
+
+					<img src="img/HTML5.png" alt="HTML5 Logo" title="HTML5" class="no m-align" width="128" height="128" />
+					<img src="img/HTML5-connectivity.png" alt="HTML5 Connectivity" title="HTML Connectivity" class="no m-align" width="128" height="128" />
+
+					<aside class="notes">
+						&middot; HTTP is only half-duplex, meaning you can't send and receive at the same time.<br />
+						&middot; Progression from AJAX => POLLING => LONG POLLING/COMET<br />
+						&middot; HTML5 Connectivity logo
+					</aside>
+				</section>
+
+				<!-- Why websockets? -->
+				<section>
+					<h2>OK... BUT WHY USE WEBSOCKETS?</h2>
+					<ul class="b20">
+						<li>Optimized for low latency applications</li>
+						<li>Cross-origin communication</li>
+						<li>No more AJAX polling</li>
+						<li>Because it's <span id="flashy">flashy</span></li>
+					</ul>
+
+					<img src="img/flashy-watch.png" alt="Flashy Watch" class="no" width="486" height="405" />
+
+					<script type="text/javascript">
+					var flashyColor = 'lightblue';
+					function flashy() {
+						flashyColor = flashyColor=='lightblue'?'lightgreen':'lightblue';
+						$('#flashy').css({ color: flashyColor });
+						setTimeout(flashy, 1000);
+					}
+					flashy();
+					</script>
+
+					<aside class="notes">
+                        &middot; Very little overhead; talk about in next slide<br />
+                        &middot; PubSub makes for pretty frontend code.
+					</aside>
+				</section>
+
+				<section>
+					<h2>THE WEBSOCKET HTTP HANDSHAKE</h2>
+
+					<div class="row">
+						<div class="col one">
+							<h5>Client Request</h5>
+<pre><code>GET /endpoint HTTP/1.1
+Origin: http://example.com
+Host: server.example.com
+Upgrade: WebSocket
+Connection: Upgrade
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+Sec-WebSocket-Version: 13
+[...]</code></pre>
+					</div>
+
+						<div class="col two">
+							<h5>Server Response</h5>
+<pre><code>HTTP/1.1 101 Switching Protocols
+Upgrade: WebSocket
+Connection: Upgrade
+Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+[...]</code></pre>
+						</div>
+					</div>
+
+					<p>WebSockets only incur HTTP header overhead on the initial handshake.</p>
+
+					<img src="img/websocket-frame.png" class="no" style="max-width:100%" />
+
+					<aside class="notes">
+						&middot; The client sends a base64 encoded key in the <strong>Sec-WebSocket-Key</strong> header.<br />
+						&middot; The server takes this key, appends a "magic string", calculates the SHA-1, base64 encodes the hash, and sends it in the <strong>sec-WebSocket-Accept</strong> response header.<br />
+						&middot; WS packets are framed with only 2 bytes.<br />
+						&middot; HTTP headers range from 200 bytes to 2kb+ due to cookies, user agent, etc.
+						</ul>
+					</aside>
+				</section>
+
+				<!-- Websocket HTML5 API -->
+				<section>
+					<h2>THE HTML5 CLIENT SIDE (JAVASCRIPT) API</h2>
+
+<pre><code>var socket = new WebSocket('ws://localhost:8000/socketServer.php');
+socket.onopen = function() {
+	console.log('Socket status: ' + socket.readyState);
+	// send message to socket server
+	socket.send('Hello, world!');
+	// close connection
+	socket.close();
+};
+
+socket.onmessage = function(msg) { console.log(msg.data); };
+socket.onclose = function() { };
+socket.onerror = function() { };</code></pre>
+
+					<aside class="notes">
+						readyState.CONNECTING = 0
+						readyState.OPEN = 1
+						readyState.CLOSED = 2
+					</aside>
+
+				</section>
+
+				<!-- Websockets Protocol History -->
+				<section>
+					<h2>WEBSOCKETS PROTOCOL HISTORY. <em>BORING!</em></h2>
+					<p>
+						TLDR; It's mostly security enhancements.
+					</p>
+
+					<img src="img/websocket-version-support.jpeg" height="" width="" style="max-width: 100%" />
+
+					<p>
+						<small>
+						Pro tip:
+						<a href="http://tools.ietf.org/rfcdiff?url1=draft-ietf-hybi-thewebsocketprotocol-15.txt&url2=draft-ietf-hybi-thewebsocketprotocol-17.txt">
+							you can check RFC diffs on the IETF site
+						</a>
+						</small>
+					</p>
+
+					<p class="small white">
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-75&url2=draft-hixie-thewebsocketprotocol-76">Hixie-75 v Hixie-76</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-75&url2=draft-ietf-hybi-thewebsocketprotocol-00">Hixie-75 v Hybi-00</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-75&url2=draft-ietf-hybi-thewebsocketprotocol-07">Hixie-75 v Hybi-07</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-75&url2=draft-ietf-hybi-thewebsocketprotocol-10">Hixie-75 v Hybi-10</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-75&url2=rfc6455">Hixie-75 v RFC6455</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-76&url2=draft-ietf-hybi-thewebsocketprotocol-00">Hixie-76 v Hybi-00</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-76&url2=draft-ietf-hybi-thewebsocketprotocol-07">Hixie-76 v Hybi-07</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-76&url2=draft-ietf-hybi-thewebsocketprotocol-10">Hixie-76 v Hybi-10</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-hixie-thewebsocketprotocol-76&url2=rfc6455">Hixie-76 v RFC6455</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-ietf-hybi-thewebsocketprotocol-00&url2=draft-ietf-hybi-thewebsocketprotocol-07">Hybi-00 v Hybi-07</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-ietf-hybi-thewebsocketprotocol-00&url2=draft-ietf-hybi-thewebsocketprotocol-10">Hybi-00 v Hybi-10</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-ietf-hybi-thewebsocketprotocol-00&url2=rfc6455">Hybi-00 v RFC6455</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-ietf-hybi-thewebsocketprotocol-07&url2=draft-ietf-hybi-thewebsocketprotocol-10">Hybi-07 v Hybi-10</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-ietf-hybi-thewebsocketprotocol-07&url2=rfc6455">Hybi-07 v RFC6455</a> &middot;
+						<a target="_blank" href="http://tools.ietf.org/rfcdiff?url1=draft-ietf-hybi-thewebsocketprotocol-10&url2=rfc6455">Hybi-10 v RFC6455</a>
+					</p>
+
+					<aside class="notes">
+                        &middot; The bottom links cover all combinations of diffs from the table.
+					</aside>
+				</section>
+
+				<section>
+					<h2>BROWSER SUPPORT: STILL SHODDY</h2>
+					<h5>Because we all have to deal with backwards compatibility...</h5>
+
+					<a href="http://caniuse.com/websockets" target="_blank" class="no">
+						<img src="img/websocket-browser-support.jpeg" alt="WebSocket Browser Support" height="534" width="944" class="no" />
+					</a>
+
+					<aside class="notes">
+                        &middot; IE < 10 requires fallback support<br />
+                        &middot; Android requires fallback support
+					</aside>
+				</section>
+
+                <!-- Ratchet -->
+                <section>
+                    <h2>RATCHET: OUR BREAD AND BUTTER</h2>
+                    <p>
+                    Ratchet is a loosely coupled PHP library providing developers with tools
+                    to create real time, bi-directional applications between
+                    clients and servers over WebSockets.
+                    </p>
+
+<pre><code>use Ratchet\MessageComponentInterface;
+use Ratchet\ConnectionInterface;
+use Ratchet\Server\IoServer;
+use Ratchet\WebSocket\WsServer;
+
+class MyWsServer implements MessageComponentInterface {
+    public function onOpen(ConnectionInterface $conn) { }
+    public function onMessage(ConnectionInterface $conn, $msg) { }
+    public function onClose(ConnectionInterface $conn) { }
+    public function onError(ConnectionInterface $conn, \Exception $e) { }
+}
+
+$server = IoServer::factory(new WsServer(new MyWsServer()), 8090);
+$server->run();</code></pre>
+
+                    <aside class="notes">
+                        &middot; Under the hood, IoServer::factory() calls LoopFactory::create() which returns LibEventLoop or StreamSelectLoop.<br />
+                        &middot; Client $conn has access to send(string $msg) and close().<br />
+                        &middot; WsServer supports RFC6455, HyBi, and Hixie76.
+                    </aside>
+                </section>
+
+                <section>
+                    <h2>RATCHET SUPPORTS THE WAMP SUB-PROTOCOL</h2>
+
+<pre><code>use Ratchet\ConnectionInterface;
+use Ratchet\Wamp\WampServerInterface;
+
+class Demo implements WampServerInterface {
+    public function onSubscribe(ConnectionInterface $conn, $topic) { }
+    public function onUnSubscribe(ConnectionInterface $conn, $topic) { }
+    public function onOpen(ConnectionInterface $conn) { }
+    public function onClose(ConnectionInterface $conn)
+    public function onCall(ConnectionInterface $conn, $id, $topic, array $params) { }
+    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) { }
+    public function onError(ConnectionInterface $conn, \Exception $e) { }
+    public function onMessage($entry) { }
+}</code></pre>
+
+                    <aside class="notes">
+                        PubSub - $conn->event($topic, $msg);
+                        RPC - $conn->callResult($id, $data);
+                        RPC - $conn->callError($id, $topic, $desc, $details);
+                        $conn->close();
+                    </aside>
+                </section>
+
+				<!-- Demo 1 -->
+				<section>
+					<h2>DEMO TIME: SITE VISITOR LOGGING</h2>
+                    <p><a href="http://107.16.19.34:8081/demos/UserLogger/">http://107.16.19.34:8081/demos/UserLogger/</a></p>
+
+					<img
+                         src="img/demo-userlogger.jpeg"
+                         height=""
+                         width=""
+                         alt="UserLogger PHP WebSockets Demo"
+                         title="This first demo is a baby step into developing WebSocket
+applications using Ratchet. It has a minimal server implementation
+with very basic client functionality of sending your browser
+information and sharing it with other users."
+                         />
+				</section>
+
+				<!-- Demo 2 -->
+				<section>
+					<h2>DEMO TIME: MOUSE TRACKING</h2>
+                    <p><a href="http://107.16.19.34:8081/demos/Mouse/">http://107.16.19.34:8081/demos/Mouse/</a></p>
+
+                    <img src="img/demo-mouse.jpeg" height="" width="" alt="UserLogger PHP WebSockets Demo"
+                         title="This demo demonstrates the simplicity of the Ratchet library.
+We are using the EXACT same backend server code. This
+demo tracks your mouse position in real time and broadcasts
+it to the other connected users. The amount of frontend code
+is the only thing that has changed here. We also introduce
+events without built-in PubSub support."/>
+				</section>
+
+                <section>
+                    <h2>DEMO TIME: TODO LIST</h2>
+                    <p><a href="http://107.16.19.34:8081/demos/Todo/">http://107.16.19.34:8081/demos/Todo/</a></p>
+
+                    <img src="img/demo-todo.jpeg" height="" width="" alt="Todo PHP WebSockets Demo"
+                        title="Everyone loves a todo list, so why not create one with multi-user,
+realtime support. This demonstrates an advanced example of adding
+WebSocket support to an existing LAMP application. To do this,
+we needed to implement a messaging protocol between Ratchet
+and the server application, which is where the ZeroMQ messaging
+layer comes into play." />
+                </section>
+
+				<!-- Websockets use cases -->
+				<section>
+					<h2>WEBSOCKETS USE CASES</h2>
+					<ul>
+						<li>Analytics and dashboards</li>
+						<li>Play-by-play sports</li>
+						<li>Stock trading</li>
+						<li>News tickers</li>
+						<li>Chat</li>
+						<li>Multiplayer gaming</li>
+						<li>Social streams</li>
+						<li>User collaboration</li>
+						<li>Instant feedback autocompletion</li>
+						<li><em><strong>YOUR IMAGINATION</strong></em></li>
+					</ul>
+				</section>
+
+				<!-- What is WAMP? -->
+				<section>
+					<h2>WEBSOCKETS AND WAMP</h2>
+					<h4>Probably not the WAMP you're thinking of</h4>
+
+					<a href="http://wamp.ws" target="_blank" class="no">
+						<img src="img/wamp.png" height="136" width="624" alt="WAMP" class="no" style="max-width: 100%" />
+					</a>
+
+					<ul>
+						<li>WAMP is a sub-protocol of WebSockets</li>
+						<li>WAMP is async <acronym title="Remote Procedure Call">RPC</acronym></li>
+						<li>WAMP is async <acronym title="Publish Subscriber Pattern">PubSub</acronym></li>
+					</ul>
+
+					<aside class="notes">
+						&middot; RPC is a messaging pattern involving peers of two roles: <strong>client</strong> and <strong>server</strong>.<br />
+                        &nbsp;&nbsp;&middot; The server provides methods to call as "endpoints".<br />
+                        &nbsp;&nbsp;&middot; The client calls remote methods, passing arguments.<br />
+                        &nbsp;&nbsp;&middot; The server executes method using args and returns result to client.<br /><br />
+
+                        &middot; PubSub is a messaging pattern involving peers of three roles:
+                        <strong>publisher</strong>, <strong>subscriber</strong>,
+                        and <strong>broker</strong>.<br />
+                        &nbsp;&nbsp;&middot; The publisher sends an event by supplying a topic (channel) as the address.
+                        &nbsp;&nbsp;&middot; The subscriber first subscribes to topics and receives events published to subscribed topics.
+                        &nbsp;&nbsp;&middot; The broker is the middle-man who mediates messages between parties. It maintains the list of topic subscribers and dispatches published events to the proper subscribers.
+					</aside>
+				</section>
+
+                <section>
+                    <h2>AUTOBAHN.JS: A JS CLIENT LIBRARY SUPPORTING WAMP</h2>
+
+                    <div class="row">
+                        <div class="col">
+                            <h5>RPC</h5>
+<pre><code>window.onload = function() {
+    var ws = ab.connect(
+        "ws://localhost:9000",
+        connected,
+        disconnected
+    );
+
+    function connected(session) {
+        var arg1 = 'hello',
+            arg2 = 'world';
+
+        session.call('topic', arg1, arg2).then(
+            callback_success_func,
+            callback_error_func
+        );
+    }
+
+    function disconnect(code, reason) {
+        console.log(reason);
+    }
+
+    function callback_success_func(res) {
+        console.log(res);
+    }
+
+    function callback_error_func(error, desc) {
+        console.log(desc);
+    }
+};</code></pre>
+                        </div>
+                        <div class="col">
+                            <h5>PubSub</h5>
+<pre><code>window.onload = function() {
+    var ws = ab.connect(
+        "ws://localhost:9000",
+        connected,
+        disconnected
+    );
+
+    function connected(session) {
+        session.subscribe('topic', callback_func);
+        session.publish('myTopic', { id: 27, ts: new Date().getTime() });
+    }
+
+    function disconnect(code, reason) {
+        console.log(reason);
+    }
+
+    function callback_func(topic, event) {
+        console.log('got event: ' + event);
+    }
+};</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+				<!-- Client side frameworks -->
+				<section>
+					<h2>CLIENT SIDE WEBSOCKET FRAMEWORKS</h2>
+					<p class="b20">So you can be under way with minimal overhead.</p>
+					<ul>
+						<li>
+							<a href="http://www.html5rocks.com/en/tutorials/websockets/basics/">Native HTML5 Support</a>
+							<small>if you don't need fallbacks.</small>
+						</li>
+						<li>
+							<a href="http://autobahn.ws">Autobahn.js</a>
+							<small>provides WAMP support.</small>
+						</li>
+						<li>
+							<a href="https://github.com/flowersinthesand/portal">Portal</a>
+							<small></small>
+						</li>
+						<li>
+							<a href="http://socket.io">Socket.IO</a>
+							<small>crudely supported by <a href="http://elephant.io">Elephant.IO</a></small>
+						</li>
+						<li>
+							<a href="https://github.com/Atmosphere/atmosphere">Atmosphere.js</a>
+							<small>supports JS/Java/Groovy, sorry PHP :(</small>
+						</li>
+					</ul>
+
+					<aside class="notes">
+                        &middot; Doesnt appear as though Atmosphere has PHP support.
+					</aside>
+				</section>
+
+				<section>
+					<h2>OTHER SERVER SIDE FRAMEWORKS</h2>
+
+					<ul>
+						<li>
+							<a href="https://github.com/varspool/Wrench">Wrench</a>
+							<small>formerly php-websocket.</small>
+						</li>
+						<li>
+							<a href="http://elephant.io/">Elephant.IO</a>
+							<small>for Socket.IO support in PHP.</small>
+						</li>
+					</ul>
+				</section>
+
+				<!-- Websockets use cases -->
+				<section>
+					<h2>COOL DEMOS</h2>
+					<p class="b20">Because copying is the sincerest form of flattery.</p>
+					<ul>
+						<li><a href="http://labs.dinahmoe.com/plink/">Plink</a></li>
+						<li><a href="http://paintwith.me/">Paint With Me</a></li>
+						<li><a href="http://connorhd.co.uk/project/pixelatr/">Pixelatr</a></li>
+						<li><a href="http://wordsquared.com/">WordSquared</a></li>
+						<li><a href="http://browserquest.mozilla.org/">BrowserQuest</a></li>
+						<li><a href="http://rawkets.com/">Rawkets</a></li>
+						<li><a href="http://jfd.github.com/wpilot/">WPilot</a></li>
+						<li><a href="http://rumpetroll.com/">Rumpetroll</a></li>
+						<li><a href="http://jitt.li/">JiTT Realtim Twitterwall</a></li>
+						<li><a href="http://code.google.com/p/quake2-gwt-port/">Quake 2 Port</a></li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li><strong>Plink</strong> is multiplayer music.</li>
+							<li><strong>Paint With Me</strong> is a painting application.</li>
+							<li><strong>Pixelatr</strong> is a drawing application.</li>
+							<li><strong>WordSquared</strong> is a word game.</li>
+							<li><strong>BrowserQuest</strong> is a MMORPG.</li>
+							<li><strong>Rawkets</strong> is a fighter game.</li>
+							<li><strong>WPilot</strong> is a space shooter.</li>
+							<li><strong>Rumpetroll</strong> is collaborative music via a drum pad.</li>
+							<li><strong>JiTT</strong> shows you twitter updates for a keyword.</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>CREDITS</h2>
+
+                    <a href="http://reactphp.org/" target="_blank" class="no">
+                        <img src="img/react-logo.png" class="no" alt="React PHP" />
+                    </a>
+
+					<ul>
+                        <li><a href="http://socketo.me" target="_blank">Ratchet</a></li>
+                        <li><a href="http://autobahn.ws/" target="_blank">Autobahn.js</a></li>
+                        <li><a href="http://wamp.ws" target="_blank">WAMP.ws</a></li>
+						<li><a href="http://www.developerfusion.com/article/143158/an-introduction-to-websockets/" target="_blank">An Introduction To WebSockets</a></li>
+						<li><a href="http://www.websocket.org/aboutwebsocket.html" target="_blank">WebSocket.org | About HTML5 WebSockets</a></li>
+						<li><a href="http://www.websocket.org/quantum.html" target="_blank">WebSocket.org | HTML5 Web Sockets: A Quantum Leap in Scalability for the Web</a></li>
+						<li><a href="http://calendar.perfplanet.com/2010/bloated-request-response-headers/" target="_blank">Bloated Request &amp; Response Headers</a></li>
+						<li><a href="http://www.w3.org/standards/history/websockets" target="_blank">W3C | The Web Sockets API Publication History</a></li>
+						<li><a href="http://en.wikipedia.org/wiki/WebSocket" target="_blank">Wikipedia | WebSocket</a></li>
+                        <li><a href="http://caniuse.com/websockets" target="_blank">CanIUse?</a></li>
+                        <li><a href="http://tools.ietf.org" target="_blank">IETF</a></li>
+                        <li><a href="http://libevent.org/" target="_blank">LibEvent</a></li>
+					</ul>
+				</section>
+
+				<section data-state="end">
+					<h2>QUESTIONS? COMMENTS?</h2>
+					<p>
+					<a href="https://joind.in/8020" target="_blank">https://joind.in/8020</a>
+					</p>
+				</section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: false,
+
+				// default/cube/page/concave/zoom/linear/fade/none
+				theme: Reveal.getQueryHash().theme,
+				transition: Reveal.getQueryHash().transition || 'fade',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.tabReplace = '    '; hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

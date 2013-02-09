@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Creating Realtime Applications with PHP and Websockets | Corey Ballou</title>
+        <link href="../css/bootstrap.css" rel="stylesheet" media="screen">
+        <link href="../css/custom.css" rel="stylesheet" media="screen">
+        <style>
+        html, body { width: 100%; height: 100%; background: #f0f0f0; color: #222; text-align: center; }
+        body { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; padding: 20px; }
+        #main { padding: 20px; }
+        p { font-size: 2em; line-height: 1.4; margin-bottom: 1em; }
+
+        h1 { font-size: 4em; margin-bottom: .6em; }
+        ul { display: block; margin: 0 auto; max-width: 500px; min-width: 320px; font-size: 2em; }
+        ul li { list-style: none; margin: 0 0 20px; }
+        ul li p { font-size: 0.7em; }
+        ul li a.demo { display: block; border: 1px solid transparent; margin: 0 0 10px; padding: 20px 10px; background: #028d79; color: #fff; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; }
+        ul li a { text-decoration: none; }
+        ul li a:hover { background: #03A089; text-decoration: none; }
+        </style>
+    </head>
+    <body>
+        <div id="main" class="unselectable">
+            <h1>Creating Realtime Applications with PHP and Websockets</h1>
+            <div id="credits">
+                <span>
+                    Authored by <a href="http://coreyballou.co">Corey Ballou</a><br />
+                    <a href="http://twitter.com/cballou">@cballou</a> on twitter<br />
+                    <a href="http://github.com/cballou/php-websockets-demos/">fork on github</a>
+                </span>
+            </div>
+            <p>
+            Below you will find descriptions and links to the interactive demos used for the presentation.
+            </p>
+            <ul>
+                <li>
+                    <a href="/demos/Mouse/" class="demo">Mouse</a>
+                    <p>
+                    The user logger demo is the simplest of the three demos. The backend WebSocket
+                    server PHP code is fairly stock and the frontend JavaScript adds a very small
+                    amount of application logic on top of the core HTML5 WebSockets API. The application
+                    itself demonstrates real-time monitoring of user interaction with a website by
+                    recording their browser settings and broadcasting them out to all other connected
+                    users.
+                    </p>
+                </li>
+                <li>
+                    <a href="/demos/UserLogger/" class="demo">UserLogger</a>
+                    <p>
+                    The mouse tracking demo takes things a step further. The WebSocket server backend
+                    used is exactly the same as that used in the User Logger demo. The true difference
+                    is in the amount of client-side JavaScript. In this demo, we bind mouse movement
+                    and click events to a callback function which records the current position. Each
+                    user receives a custom generated circular dot with their own color and size. On
+                    each movement, a WebSocket send event is triggered sending the server the user's
+                    new coordinates. The server broadcasts the new coordinates and accompanying user
+                    data to the remainder of the connected clients and they update their screens
+                    accordingly.
+                    </p>
+                </li>
+                <li>
+                    <a href="/demos/Todo/" class="demo">Todo</a>
+<p>
+The todo list demo takes a basic CRUD implementation of a todo list and turns it
+on it's head. This demo introduces the ability to add WebSockets to an existing
+PHP application. This does come at quite a cost, however, as it entails adding
+a messaging layer to your existing application so it may talk to the WebSocket
+server. In our case, we use ZeroMQ as it is supported by <a href="https://github.com/reactphp/zmq">react/zeromq</a>.
+The application also introduces the <a href="http://wamp.ws">WAMP</a> sub-protocol of WebSockets,
+allowing us to use RPC and PubSub patterns to manage the sheer number of different
+event types. One of the key takeaways from this demo is the amount of edge-cases
+that need to be handled due to concurrency. This includes various forms of locking
+to ensure users don't step on each other's toes.
+</p>
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>

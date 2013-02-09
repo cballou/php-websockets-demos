@@ -1,0 +1,31 @@
+#wrapper { width: 960px; max-width: 95%; margin: 0 auto; }
+#todoList { display: block; position: relative; margin: 0; padding: 10px; background: #e6e6e6; -moz-border-radius: 6px; -webkit-border-radius: 6px; border-radius: 6px; }
+#todoList.locked { background-color: #F9CCCC; }
+#todoList li { background-color:#F9F9F9; border:1px solid #EEE; border-top-color: #fff; border-left-color: #fff; list-style:none; margin: 6px 0; padding:6px 9px; position:relative; cursor: pointer; text-shadow:1px 1px 0 white; -moz-border-radius:6px; -webkit-border-radius:6px; border-radius:6px; -moz-box-shadow: 1px 1px 3px #999; -webkit-box-shadow: 1px 1px 3px #999; box-shadow: 1px 1px 3px #999; }
+#todoList li.active,
+#todoList li:hover{ border-color:#9be0f9; -moz-box-shadow: 1px 1px 3px #999, inset 0 0 40px #A6E5FD; -webkit-box-shadow: 1px 1px 3px #999, inset 0 0 40px #A6E5FD; box-shadow: 1px 1px 3px #999, inset 0 0 40px #A6E5FD; }
+#todoList li.locked,
+#todoList li.locked:hover { cursor: default; border:1px solid #EEE; border-top-color: #fff; border-left-color: #fff; -moz-box-shadow: 1px 1px 3px #999, inset 0 0 40px #FCA4A4; -webkit-box-shadow: 1px 1px 3px #999, inset 0 0 40px #FCA4A4; box-shadow: 1px 1px 3px #999, inset 0 0 40px #FCA4A4; }
+#todoList li,
+#todoList li a { font-family: Verdana, Arial, sans-serif; }
+#todoList li.locked .actions a { display: none; }
+.todo .text { color: #777777; font-size:1.4em; }
+.todo .actions { position:absolute; right:7px; top:50%; margin-top: -11px; }
+.todo .actions a { display:block; width:16px; height:16px; overflow:hidden; float:left; text-indent:-9999px; margin:3px; }
+.todo .actions a.edit { background:url("img/edit.png") no-repeat center center; }
+.todo .actions a.delete { background:url("img/delete.png") no-repeat center center; }
+.todo input { width: 50%; padding: 3px 4px; margin: 0; border:1px solid #CCC; color:#666; font-family:Arial,Helvetica,sans-serif; font-size:0.725em; }
+
+.editTodo { display:inline; font-size:0.6em; padding-left:9px; }
+.editTodo a { font-weight:bold; }
+a.discardChanges{ color:#C00 !important; }
+a.saveChanges{ color:#4DB209 !important; }
+
+.ui-button,.ui-dialog-titlebar{ font-size:0.72em !important; }
+
+#dialog-confirm { display:none; font-size:0.9em; padding:1em 1em 0; }
+#btn-add { margin: 20px auto; }
+
+a.green-button,
+a.green-button:visited { display: inline-block; margin: 0 auto; padding: 10px; color: black; background: #61B329; border: 1px solid #419309; font-size:14px; font-weight:bold; text-align:center; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; text-transform: uppercase; }
+a.green-button:hover { background-color: #71C339; text-decoration:none; background-position:left bottom; }

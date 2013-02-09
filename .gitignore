@@ -1,0 +1,13 @@
+favicon.*
+.DS_Store
+public/uploads/*
+!public/uploads/index.php
+storage/cache*
+storage/database*
+storage/logs*
+storage/sessions*
+storage/sql*
+storage/views*
+storage/work*
+composer.phar
+vendor*

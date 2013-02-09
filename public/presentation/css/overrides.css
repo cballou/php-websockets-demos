@@ -1,0 +1,124 @@
+img.m-align {
+    vertical-align: middle;
+}
+
+.reveal h1,
+.reveal h2 {
+    color: #F36F21;
+}
+
+.reveal h1 {
+    color: rgba(243, 111, 33, .8);
+    text-shadow:
+        -1px -1px 0 #f0f0f0,
+        0 1px 0 #333333,
+        0 2px 0 #393939,
+        0 3px 0 #222222,
+        0 4px 0 #292929,
+        0 5px 0 #111111,
+        0 6px 1px rgba(0, 0, 0, 0.1),
+        0 0 5px rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.3),
+        0 3px 5px rgba(0, 0, 0, 0.2),
+        0 5px 10px rgba(0, 0, 0, 0.25),
+        0 20px 20px rgba(0, 0, 0, 0.15);
+}
+
+.reveal h2 {
+    text-shadow:
+        0 1px 0 #222222,
+        0 2px 0 #292929,
+        0 3px 0 #111111,
+        0 6px 1px rgba(0, 0, 0, 0.1),
+        0 0 5px rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.reveal small {
+    vertical-align: middle;
+}
+
+.reveal section img.no {
+    background: transparent;
+    border: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.reveal a:not(.image) {
+    color: #F36F21;
+    text-shadow: 1px 1px 2px #222;
+}
+
+.reveal a.alt:not(.image) {
+    color: #c9c9c9;
+}
+
+.reveal .roll:hover,
+.reveal a:not(.image):hover {
+    color: inherit;
+    background: transparent;
+    text-shadow: none;
+}
+
+.reveal section ul,
+.reveal section ol {
+    display: block;
+    text-align: left;
+}
+
+.b20 { margin-bottom: 20px !important; }
+.b40 { margin-bottom: 40px !important; }
+
+#flashy {
+    -moz-transition: all 1s ease-in-out;
+    -webkit-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
+}
+
+.row {
+    overflow: hidden;
+}
+
+.col {
+    float: left;
+    display: inline;
+    width: 50%;
+    padding: 10px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.small,
+.small a {
+    font-size: 10px !important;
+}
+
+.white {
+    color: #666;
+}
+
+.white a {
+    color: #fff !important;
+}
+
+.white a:hover {
+    color: lightblue !important;
+}
+
+img {
+    max-width: 100% important;
+}
+
+.end body {
+    background-image: url('../img/thats-all-folks.jpeg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
