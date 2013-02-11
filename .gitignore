@@ -10,4 +10,5 @@ storage/sql*
 storage/views*
 storage/work*
 composer.phar
+composer.lock
 vendor*
