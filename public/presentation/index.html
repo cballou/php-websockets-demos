@@ -100,6 +100,68 @@
 					</aside>
 				</section>
 
+                <section>
+                    <h2>LET'S TALK HTTP OVERHEAD</h2>
+                    <h5>Request</h5>
+                    <img src="/img/google-http-request-headers.png" />
+
+                    <h5>Response</h5>
+                    <img src="/img/google-http-response-headers.png" />
+
+                    <aside class="notes">
+                        &middot; Request headers are 1356 characters (bytes) long<br />
+                        &middot; Response headers are 247 characters (bytes) long<br />
+                        &middot; Total headers over 1600 bytes<br />
+                        &middot;
+                    </aside>
+                </section>
+
+                <section>
+                    <h2>LET'S TALK PERFORMANCE</h2>
+
+                    <p>
+                    Let's compare AJAX polling vs. WebSockets using the previous header example.
+                    </p>
+
+                    <p>
+                    <small>
+                    and assume AJAX polling every second vs. receiving a WebSocket message
+                    every second.
+                    </small>
+                    </p>
+
+                    <table cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td>Clients</td>
+                            <td>HTTP Throughput</td>
+                            <td>WS Throughput</td>
+                            <td>Difference</td>
+                        </tr>
+                        <tr>
+                            <td>1,000</td>
+                            <td>1.56 MB</td>
+                            <td>0.002 MB</td>
+                            <td>780x</td>
+                        </tr>
+                        <tr>
+                            <td>10,000</td>
+                            <td>15.26 MB</td>
+                            <td>0.019 MB</td>
+                            <td>803x</td>
+                        </tr>
+                        <tr>
+                            <td>100,000</td>
+                            <td>152.59 MB</td>
+                            <td>0.191 MB</td>
+                            <td>799x</td>
+                        </tr>
+                    </table>
+
+                    <aside class="notes">
+                        &middot; WebSockets also reduce latency because client doesnt need to make requests to server.
+                    </aside>
+                </section>
+
 				<section>
 					<h2>THE WEBSOCKET HTTP HANDSHAKE</h2>
 
@@ -126,7 +188,7 @@ Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
 						</div>
 					</div>
 
-					<p>WebSockets only incur HTTP header overhead on the initial handshake.</p>
+					<p>Only incur HTTP header overhead on the initial handshake.</p>
 
 					<img src="img/websocket-frame.png" class="no" style="max-width:100%" />
 
@@ -137,31 +199,6 @@ Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
 						&middot; HTTP headers range from 200 bytes to 2kb+ due to cookies, user agent, etc.
 						</ul>
 					</aside>
-				</section>
-
-				<!-- Websocket HTML5 API -->
-				<section>
-					<h2>THE HTML5 CLIENT SIDE (JAVASCRIPT) API</h2>
-
-<pre><code>var socket = new WebSocket('ws://localhost:8000/socketServer.php');
-socket.onopen = function() {
-	console.log('Socket status: ' + socket.readyState);
-	// send message to socket server
-	socket.send('Hello, world!');
-	// close connection
-	socket.close();
-};
-
-socket.onmessage = function(msg) { console.log(msg.data); };
-socket.onclose = function() { };
-socket.onerror = function() { };</code></pre>
-
-					<aside class="notes">
-						readyState.CONNECTING = 0
-						readyState.OPEN = 1
-						readyState.CLOSED = 2
-					</aside>
-
 				</section>
 
 				<!-- Websockets Protocol History -->
@@ -210,7 +247,7 @@ socket.onerror = function() { };</code></pre>
 					<h5>Because we all have to deal with backwards compatibility...</h5>
 
 					<a href="http://caniuse.com/websockets" target="_blank" class="no">
-						<img src="img/websocket-browser-support.jpeg" alt="WebSocket Browser Support" height="534" width="944" class="no" />
+						<img src="img/websocket-browser-support.png" alt="WebSocket Browser Support" height="534" width="944" class="no" />
 					</a>
 
 					<aside class="notes">
@@ -219,9 +256,34 @@ socket.onerror = function() { };</code></pre>
 					</aside>
 				</section>
 
+				<!-- Websocket HTML5 API -->
+				<section>
+					<h2>CLIENT SIDE: HTML5 JS API</h2>
+
+<pre><code>var socket = new WebSocket('ws://localhost:8000/socketServer.php');
+socket.onopen = function() {
+	console.log('Socket status: ' + socket.readyState);
+	// send message to socket server
+	socket.send('Hello, world!');
+	// close connection
+	socket.close();
+};
+
+socket.onmessage = function(msg) { console.log(msg.data); };
+socket.onclose = function() { };
+socket.onerror = function() { };</code></pre>
+
+					<aside class="notes">
+						readyState.CONNECTING = 0<br />
+						readyState.OPEN = 1<br />
+						readyState.CLOSED = 2<br /><br />
+                        Any browser with Flash can support WebSocket using the web-socket-js shim/polyfill.
+					</aside>
+				</section>
+
                 <!-- Ratchet -->
                 <section>
-                    <h2>RATCHET: OUR BREAD AND BUTTER</h2>
+                    <h2>SERVER SIDE: RATCHET'S OUR BREAD AND BUTTER</h2>
                     <p>
                     Ratchet is a loosely coupled PHP library providing developers with tools
                     to create real time, bi-directional applications between
