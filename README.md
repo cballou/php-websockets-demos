@@ -180,3 +180,7 @@ Simply change the relative path to `public/demos/Todo/inc/table.sql` as necessar
 * [WAMP](http://wamp.ws)
 * [Tutorialzine | AJAX-ed Todo List With PHP, MySQL & jQuery](http://tutorialzine.com/2010/03/ajax-todo-list-jquery-php-mysql-css/)
 * https://speakerdeck.com/vikgamov/websockets-the-current-state-of-the-most-valuable-html5-api-for-java-developers
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cballou/php-websockets-demos/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
