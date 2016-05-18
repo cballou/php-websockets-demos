@@ -17,7 +17,9 @@ run the demos. The following assumptions are made regarding your local machine
 
 ## Viewing the Presentation Slides ##
 
-To view the presentation slides:
+You can view the slides on the SlideShare presentation, [Creating Realtime Applications with PHP and Websockets](http://www.slideshare.net/CoreyBallou/creating-realtime-applications-with-php-and-websockets).
+
+Alternatively, you can perform the following steps to view these slides locally:
 
 * Clone this repository via `git clone path/to/repository.git`
 * Open up your browser of choice, ideally something with CSS3 support (Chrome, Firefox, or Safari)
