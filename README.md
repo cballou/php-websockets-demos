@@ -15,6 +15,10 @@ run the demos. The following assumptions are made regarding your local machine
 * You have globally installed composer or will install it locally in the application root directory
 * You have MySQL installed and setup (only for the Todo demo)
 
+## Live Demo ##
+
+It's only fun with a buddy, so please grab a friend: [PHP Websocket Demos](websockets.coreyballou.com)
+
 ## Viewing the Presentation Slides ##
 
 You can view the slides on the SlideShare presentation, [Creating Realtime Applications with PHP and Websockets](http://www.slideshare.net/CoreyBallou/creating-realtime-applications-with-php-and-websockets).
