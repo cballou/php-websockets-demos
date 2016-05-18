@@ -17,7 +17,7 @@ run the demos. The following assumptions are made regarding your local machine
 
 ## Live Demo ##
 
-It's only fun with a buddy, so please grab a friend: [PHP Websocket Demos](websockets.coreyballou.com)
+It's only fun with a buddy, so please grab a friend: [PHP Websocket Demos](http://websockets.coreyballou.com)
 
 ## Viewing the Presentation Slides ##
 
